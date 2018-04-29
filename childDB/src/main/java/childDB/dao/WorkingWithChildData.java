@@ -38,6 +38,33 @@ public class WorkingWithChildData {
         }
     }
 
+    public static Institution getInstitutionFromID(int id){
+        Institution institution = new Institution();
+        String query = "SELECT * FROM institutions WHERE id=" + id +";";
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try (Connection connection = DriverManager.getConnection(HOST, USERNAME, PASSWORD); Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                institution = new Institution();
+                institution.setId(resultSet.getInt((1)));
+                institution.setName(resultSet.getString(2));
+                institution.setUserId(resultSet.getInt(3));
+                institution.setParentId(resultSet.getInt((4)));
+                institution.setLocationId(resultSet.getInt(5));
+                institution.setType(resultSet.getInt(6));
+            }
+            return institution;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
     public static ArrayList<Institution> getInstitutions() {
         ArrayList<Institution> institutions = new ArrayList<>();
         String query = "SELECT * FROM institutions;";
@@ -65,7 +92,7 @@ public class WorkingWithChildData {
         }
     }
 
-    public static ArrayList<User> getUsers(){
+    public static ArrayList<User> getUsers() {
         ArrayList<User> users = new ArrayList<>();
         String query = "SELECT * FROM users;";
         try {
@@ -75,7 +102,7 @@ public class WorkingWithChildData {
         }
         try (Connection connection = DriverManager.getConnection(HOST, USERNAME, PASSWORD); Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(query);
-            User user ;
+            User user;
             while (resultSet.next()) {
                 user = new User();
                 user.setID(resultSet.getInt(1));

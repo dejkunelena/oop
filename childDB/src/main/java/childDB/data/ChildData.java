@@ -9,6 +9,8 @@ public class ChildData {
 
     public static int ID = -1;
 
+    public static int instId = -1;
+
     public static ArrayList<String> diagnoses = new ArrayList<String>(
             Arrays.asList("Дислалия", "Алалия","Афазия","Заикание")
     );

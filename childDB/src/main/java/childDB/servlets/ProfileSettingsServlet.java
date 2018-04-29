@@ -1,11 +1,10 @@
 package childDB.servlets;
 
-import childDB.dao.WorkingWithChild;
 import childDB.dao.WorkingWithChildData;
 import childDB.dao.WorkingWithUsers;
 import childDB.entities.Institution;
 import childDB.entities.User;
-import com.sun.javafx.scene.layout.region.Margins;
+import childDB.model.Model;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,12 +12,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 
-public class RegistrationServlet extends HttpServlet {
+public class ProfileSettingsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        RequestDispatcher requestDispatcher = req.getRequestDispatcher("views/registration.jsp");
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("views/profileSettings.jsp");
+        Model model = Model.getInstance();
+        req.setAttribute("user", model.getUser());
+        req.setAttribute("inst", WorkingWithChildData.getInstitutionFromID(model.getUser().getInstId()));
         requestDispatcher.forward(req, resp);
     }
 
@@ -51,5 +52,4 @@ public class RegistrationServlet extends HttpServlet {
 
         }
     }
-
 }

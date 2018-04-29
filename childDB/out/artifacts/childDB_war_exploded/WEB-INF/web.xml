@@ -58,5 +58,48 @@
         <url-pattern>/card</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>report</servlet-name>
+        <servlet-class>childDB.servlets.ReportServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>report</servlet-name>
+        <url-pattern>/report</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>statistic</servlet-name>
+        <servlet-class>childDB.servlets.StatisticsServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>statistic</servlet-name>
+        <url-pattern>/statistic</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>profile</servlet-name>
+        <servlet-class>childDB.servlets.ProfileServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>profile</servlet-name>
+        <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>profileSettings</servlet-name>
+        <servlet-class>childDB.servlets.ProfileSettingsServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>profileSettings</servlet-name>
+        <url-pattern>/profileSettings</url-pattern>
+    </servlet-mapping>
+
+
+
+
 
 </web-app>

@@ -11,7 +11,7 @@ public class WorkingWithChild {
     private static final String USERNAME = "root";
     private static final String PASSWORD = "root";
 
-    public static String addChild(Child child){
+    public static String addChild(Child child, String table){
         String diagnoses = "";
         for(int s : child.getDiagnoses()){
             diagnoses += s + " ";
@@ -39,19 +39,18 @@ public class WorkingWithChild {
         int isCompleteFamily = 0;
         if(child.isCompleteFamily() == false) isCompleteFamily = 1;
 
-        String query = "INSERT INTO children (first_name, last_name, middle_name, is_man," +
+        String query = "INSERT INTO " + table + " (first_name, last_name, middle_name, is_man," +
                " birthday, inst_id, address, diagnoses, class, disability, " +
                "is_needs_help, type_of_help_in_center, type_of_help_in_school, " +
                "form_of_custody, is_complete_family, mother, father, is_large_family, " +
-               "is_low_income_family)" +
+               "is_low_income_family, notes, location)" +
                 "VALUES ('" + child.getFirstName() + "','" + child.getLastName() + "','" + child.getMiddleName() +
                 "','" + man + "','" + child.getBirthday() + "','" + child.getInstID() + "','" +
                 child.getAddress() + "','" + diagnoses + "','" + child.getClassOrCource() + "','" +
                 child.getDisability() + "','" + isNeedHelp + "','" + child.getTypeOfHelpInCenter() +
                 "','" + child.getTypeOfHelpInSchool() + "','" + child.getFormOfCustody() + "','" +
                 isCompleteFamily + "','" + mother + "','" + father + "','" + isLargeFamily + "','" +
-                isLowIncomeFamily + "');";
-
+                isLowIncomeFamily + "','" + child.getNotes() + "','" + child.getCity() +"');";
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -104,7 +103,8 @@ public class WorkingWithChild {
                 "', type_of_help_in_center='" + child.getTypeOfHelpInCenter() + "', type_of_help_in_school='" +
                 child.getTypeOfHelpInSchool() + "', form_of_custody='" + child.getFormOfCustody() +
                 "', is_complete_family='" + isCompleteFamily + "', mother='" + mother + "', father='" + father +"', is_large_family='" +
-                isLargeFamily + "', is_low_income_family='" +isLowIncomeFamily + "' WHERE id='" + id + "';";
+                isLargeFamily + "', is_low_income_family='" +isLowIncomeFamily + "', location='" + child.getCity()+
+                "', notes='" + child.getNotes() + "' WHERE id='" + id + "';";
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -124,7 +124,6 @@ public class WorkingWithChild {
 
     public static String deleteChild(int id){
         String query = "DELETE FROM children WHERE id='" + id + "';";
-
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -192,6 +191,8 @@ public class WorkingWithChild {
                 child.setFather(father);
                 child.setLargeFamily(resultSet.getBoolean(19));
                 child.setLowIncomeFamily(resultSet.getBoolean(20));
+                child.setCity(resultSet.getInt(25));
+                child.setNotes(resultSet.getString(24));
                 children.add(child);
             }
             return children;

@@ -5,6 +5,7 @@ import childDB.dao.WorkingWithUsers;
 import childDB.entities.Child;
 import childDB.entities.User;
 import childDB.model.Model;
+import com.sun.xml.internal.ws.api.pipe.FiberContextSwitchInterceptor;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -25,35 +26,11 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("views/login.jsp");
-        User user = new User();
-        user.setPassword("root");
-        user.setLogin("root");
-        List<Child> children = new ArrayList<>();
-        Child child = new Child();
-        child.setFirstName("child0");
-        child.setLastName("lastname");
-        child.setMan(true);
-        children.add(child);
-        child = new Child();
-        child.setFirstName("child1");
-        child.setLastName("lastname");
-        child.setMan(false);
-        children.add(child);
-        child = new Child();
-        child.setFirstName("child2");
-        child.setLastName("lastname");
-        children.add(child);
-        child = new Child();
-        child.setFirstName("child3");
-        child.setLastName("lastname");
-        children.add(child);
-        child = new Child();
-        child.setFirstName("child4");
-        child.setLastName("lastname");
-        children.add(child);
-        Model model = Model.getInstance();
-        model.setUser(user);
-        model.setChildren(children);
+      //  User user = new User();
+       // user.setPassword("root");
+        //user.setLogin("root");
+        //Model model = Model.getInstance();
+        //model.setUser(user);
         requestDispatcher.forward(req, resp);
     }
 
@@ -65,13 +42,14 @@ public class LoginServlet extends HttpServlet {
         User user = new User();
         user.setPassword(password);
         user.setLogin(login);
-
-       if(WorkingWithUsers.tryToAuthentication(user)== null)
+        user = WorkingWithUsers.tryToAuthentication(user);
+       if(user== null)
            req.setAttribute("message", "Неверный логин или пароль");
-       else{           String contextPath = req.getContextPath();
-
-        // ==> /ServletTutorial/showMe
-        resp.sendRedirect(contextPath + "/childrenList");}
+       else{
+           String contextPath = req.getContextPath();
+           model.setUser(user);
+           resp.sendRedirect(contextPath + "/childrenList");
+       }
            //resp.sendRedirect(req.getContextPath() + "/childrenList");
            //req.getRequestDispatcher("/childrenList").forward(req, resp);
 

@@ -4,6 +4,7 @@ import childDB.dao.WorkingWithChild;
 import childDB.dao.WorkingWithChildData;
 import childDB.data.ChildData;
 import childDB.entities.Child;
+import childDB.entities.Institution;
 import childDB.model.Model;
 
 import javax.servlet.RequestDispatcher;
@@ -21,7 +22,31 @@ public class ChildrenListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("views/childrenList.jsp");
         Model model = Model.getInstance();
-        List<Child> children = WorkingWithChild.getAllChild(1);
+        ChildData.ID = -1;
+        ChildData.instId = model.getUser().getInstId();
+        int instId = ChildData.instId;
+        if(req.getQueryString() != null)
+        {
+            if(req.getParameter("id") != null)
+                ChildData.ID = Integer.parseInt(req.getParameter("id"));
+            if(req.getParameter("db") != null)
+                instId = Integer.parseInt(req.getParameter("db"));
+        };
+        ChildData.instId = instId;
+        List<Child> children = WorkingWithChild.getAllChild(ChildData.instId);
+        if(instId == -1){
+            ArrayList<Institution> institutions = WorkingWithChildData.getInstitutions();
+            ArrayList<Institution> newInst = new ArrayList<>();
+            for(int i = 0; i < institutions.size(); i++){
+                if( institutions.get(i).getParentId() == model.getUser().getInstId()){
+                    newInst.add(institutions.get(i));
+                }
+            }
+            for( int i =0; i < newInst.size(); i++){
+                children.addAll(WorkingWithChild.getAllChild(newInst.get(i).getId()));
+            }
+            children.addAll(WorkingWithChild.getAllChild(model.getUser().getInstId()));
+        }
         req.setAttribute("children", children);
         if(ChildData.ID != -1){
             for(Child ch : children){
@@ -41,18 +66,47 @@ public class ChildrenListServlet extends HttpServlet {
                 ChildData.ID = -1;
             }
             else
-                req.setAttribute("adding", WorkingWithChild.addChild(getChildInfo(req)));
-            doGet(req, resp);
-        }else if("update".equals(action)){
-            ChildData.ID = Integer.parseInt(req.getParameter("id"));
-            doGet(req, resp);
-        } else if("delete".equals(action)){
-            ChildData.ID = Integer.parseInt(req.getParameter("id"));
-            req.setAttribute("adding",WorkingWithChild.deleteChild(ChildData.ID));
-            ChildData.ID = -1;
+                req.setAttribute("adding", WorkingWithChild.addChild(getChildInfo(req),"children"));
             doGet(req, resp);
         }
-
+        else if("update".equals(action)){
+            ChildData.ID = Integer.parseInt(req.getParameter("id"));
+            doGet(req, resp);
+        }
+        else if("add".equals(action)){
+            String contextPath = req.getContextPath();
+            resp.sendRedirect(contextPath + "/childrenList");
+        }
+        else if("delete".equals(action)){
+            if(ChildData.ID != -1){
+                int id = 0;
+                ArrayList<Child> children = WorkingWithChild.getAllChild(1);
+                for( int i = 0; i < children.size(); i++ ){
+                    if(children.get(i).getID() == ChildData.ID){
+                        id = i;
+                    }
+                }
+                req.setAttribute("adding",WorkingWithChild.addChild(children.get(id),"deleted"));
+                WorkingWithChild.deleteChild(ChildData.ID);
+                ChildData.ID = -1;
+                doGet(req, resp);
+            }
+        }
+        else if("archive".equals(action)){
+            if(ChildData.ID != -1){
+                int id = 0;
+                ArrayList<Child> children = WorkingWithChild.getAllChild(1);
+                for( int i = 0; i < children.size(); i++ ){
+                    if(children.get(i).getID() == ChildData.ID){
+                        id = i;
+                    }
+                }
+                req.setAttribute("adding",WorkingWithChild.addChild(children.get(id),"archive"));
+                WorkingWithChild.deleteChild(ChildData.ID);
+                ChildData.ID = -1;
+                doGet(req, resp);
+            }
+        }
         else if ("addNew".equals(action)) {
             ChildData.ID = -1;
             doGet(req, resp);
@@ -111,6 +165,8 @@ public class ChildrenListServlet extends HttpServlet {
             fath.add(Integer.parseInt(s));
         }
         child.setFather(fath);
+        child.setNotes(req.getParameter("edit"));
+        child.setCity(Integer.parseInt(req.getParameter("location")));
         return child;
     }
 

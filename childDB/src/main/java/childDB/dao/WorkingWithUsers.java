@@ -76,8 +76,4 @@ public class WorkingWithUsers {
     public void updateUser(){
 
     }
-
-    public void registration(){
-
-    }
 }
