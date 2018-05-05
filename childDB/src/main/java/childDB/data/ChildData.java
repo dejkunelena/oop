@@ -8,7 +8,6 @@ import java.util.Arrays;
 public class ChildData {
 
     public static int ID = -1;
-
     public static int instId = -1;
 
     public static ArrayList<String> diagnoses = new ArrayList<String>(
@@ -44,6 +43,11 @@ public class ChildData {
 
     public static ArrayList<String> formOfHelpInSchool = new ArrayList<String>(
             Arrays.asList("Спедиальная группа в дошкольном учреждении",
+                    "Интергированная группа в ДУ", "Дошкольники ДУ на дому"
+            ));
+
+    public static ArrayList<String> archiveList = new ArrayList<String>(
+            Arrays.asList("Спедиальная группа",
                     "Интергированная группа в ДУ", "Дошкольники ДУ на дому"
             ));
 

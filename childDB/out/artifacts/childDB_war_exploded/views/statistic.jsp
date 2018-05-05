@@ -1,4 +1,13 @@
-<%--
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="childDB.data.ChildData" %>
+<%@ page import="childDB.entities.Location" %>
+<%@ page import="childDB.dao.WorkingWithChildData" %>
+<%@ page import="childDB.model.Model" %>
+<%@ page import="childDB.entities.User" %>
+<%@ page import="childDB.entities.Institution" %>
+<%@ page import="childDB.entities.Child" %>
+<%@ page import="java.lang.reflect.Array" %><%--
   Created by IntelliJ IDEA.
   User: Asus
   Date: 22.04.2018
@@ -54,6 +63,42 @@
             font-weight: bold;
             border-radius: 2px;
         }
+         #zatemnenie {
+             background: rgba(102, 102, 102, 0.5);
+             width: 100%;
+             height: 100%;
+             position: absolute;
+             top: 0;
+             left: 0;
+             display: none;
+         }
+        #okno {
+            width: 700px;
+            height: 700px;
+            text-align: center;
+            padding: 15px;
+            color: #0000cc;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            margin: auto;
+            background: #fff;
+        }
+        #zatemnenie:target {display: block;}
+        .close {
+            display: inline-block;
+            border: 1px solid #0000cc;
+            color: #0000cc;
+            padding: 0 12px;
+            margin: 10px;
+            text-decoration: none;
+            background: #f2f2f2;
+            font-size: 14pt;
+            cursor:pointer;
+        }
+        .close:hover {background: #e6e6ff;}
     </style>
 </head>
 <body>
@@ -85,6 +130,22 @@
 
     </header>
     <main class="mdl-layout__content">
+        <%    if(request.getAttribute("child")!=null)
+                        out.print(request.getAttribute("child"));
+                ArrayList<String[]> data;
+              if(request.getAttribute("data") != null){
+                  data = (ArrayList<String[]>) request.getAttribute("data");
+              }
+        %>
+        <form method="post">
+        <label>Период</label>
+                <label for="firstDate">с </label>
+                <input name="firstDate" id="firstDate" type="date" value='2018-04-29'/>
+                <label for="secondDate">по </label>
+                <input name="secondDate" id="secondDate" type="date" value='2018-04-29'/>
+             <button class="mdl-button mdl-js-button mdl-button--primary" name="action" value="add">Далее
+            </button>
+        </form>
     </main>
 </div>
 

@@ -47,6 +47,26 @@ public class ChildrenListServlet extends HttpServlet {
             }
             children.addAll(WorkingWithChild.getAllChild(model.getUser().getInstId()));
         }
+        else if (instId == -2 || instId == -3){
+            children = new ArrayList<>();
+            ArrayList<Institution> institutions = WorkingWithChildData.getInstitutions();
+            ArrayList<Institution> newInst = new ArrayList<>();
+            for(int i = 0; i < institutions.size(); i++){
+                if( institutions.get(i).getParentId() == model.getUser().getInstId()){
+                    newInst.add(institutions.get(i));
+                }
+            }
+            String table = "archive";
+            if(instId == -3)
+                table = "deleted";
+            for( int i =0; i < newInst.size(); i++){
+                String query = "SELECT * FROM " + table + " WHERE inst_id='" + newInst.get(i).getId() + "';";
+                children.addAll(WorkingWithChild.getChildFromQuery(query));
+            }
+            String query = "SELECT * FROM " + table + " WHERE inst_id='" + model.getUser().getInstId() + "';";
+            children.addAll(WorkingWithChild.getChildFromQuery(query));
+
+        }
         req.setAttribute("children", children);
         if(ChildData.ID != -1){
             for(Child ch : children){
@@ -59,14 +79,17 @@ public class ChildrenListServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html; charset=UTF-8");
         String action = req.getParameter("action");
         if("save".equals(action)){
             if(ChildData.ID != -1) {
                 req.setAttribute("adding", WorkingWithChild.updateChild(getChildInfo(req), ChildData.ID));
                 ChildData.ID = -1;
             }
-            else
-                req.setAttribute("adding", WorkingWithChild.addChild(getChildInfo(req),"children"));
+            else {
+                req.setAttribute("adding", WorkingWithChild.addChild(getChildInfo(req), "children"));
+            }
             doGet(req, resp);
         }
         else if("update".equals(action)){
@@ -101,7 +124,8 @@ public class ChildrenListServlet extends HttpServlet {
                         id = i;
                     }
                 }
-                req.setAttribute("adding",WorkingWithChild.addChild(children.get(id),"archive"));
+                req.setAttribute("adding",WorkingWithChild.addChildInArchive(children.get(id),Integer.parseInt(req.getParameter("archiveList"))
+                ));
                 WorkingWithChild.deleteChild(ChildData.ID);
                 ChildData.ID = -1;
                 doGet(req, resp);
@@ -124,7 +148,10 @@ public class ChildrenListServlet extends HttpServlet {
         } else child.setMan(false);
         child.setBirthday(Date.valueOf(req.getParameter("date")));
         child.setInstID(Integer.parseInt(req.getParameter("inst")));
-        child.setAddress(req.getParameter("address"));
+        if(req.getParameter("address") != null)
+            child.setAddress(req.getParameter("address"));
+        else
+            child.setAddress("");
         child.setCity(Integer.parseInt(req.getParameter("location")));
         String[] diagnoses = req.getParameterValues("diagnoses");
         ArrayList<Integer> d = new ArrayList<Integer>();
@@ -132,7 +159,10 @@ public class ChildrenListServlet extends HttpServlet {
             d.add(Integer.parseInt(s));
         }
         child.setDiagnoses(d);
-        child.setClassOrCource(Integer.parseInt(req.getParameter("class")));
+        if(req.getParameter("class") != null)
+            child.setClassOrCource(Integer.parseInt(req.getParameter("class")));
+        else
+            child.setClassOrCource(0);
         child.setDisability(Integer.parseInt(req.getParameter("disability")));
         String result = req.getParameter("isNeedHelp");
         if(req.getParameter("isNeedHelp") == null){
@@ -165,7 +195,11 @@ public class ChildrenListServlet extends HttpServlet {
             fath.add(Integer.parseInt(s));
         }
         child.setFather(fath);
-        child.setNotes(req.getParameter("edit"));
+
+       if(req.getParameter("edit") != null)
+           child.setNotes(req.getParameter("edit"));
+       else
+           child.setNotes("");
         child.setCity(Integer.parseInt(req.getParameter("location")));
         return child;
     }

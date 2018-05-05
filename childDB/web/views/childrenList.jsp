@@ -7,7 +7,8 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.text.DateFormat" %>
-<%@ page import="childDB.model.Model" %><%--
+<%@ page import="childDB.model.Model" %>
+<%@ page import="java.util.Date" %><%--
   Created by IntelliJ IDEA.
   User: Asus
   Date: 09.04.2018
@@ -75,6 +76,9 @@
         .demo-card-wide > .mdl-card__menu {
             color: #fff;
         }
+        .td-style {
+            border: 1px gray;
+        }
     </style>
 </head>
 
@@ -100,26 +104,27 @@
                 <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
                     for="demo-menu-lower-right">
                     <li class="mdl-menu__item"><a href="/profileSettings"/>Настройки</li>
-                    <li class="mdl-menu__item"><a href="/login"/>Выйти</li>
+                    <li class="mdl-menu__item"><a href="/login">Выйти</a></li>
                 </ul>
             </nav>
         </div>
     </header>
     <div class="mdl-layout__drawer">
-        <span class="mdl-layout-title">Управление БД</span>
+        <span class="mdl-layout-title">Управление</span>
         <nav class="mdl-navigation">
             <a class="mdl-navigation__link" href="/childrenList?db=<% Model mod = Model.getInstance(); out.print(mod.getUser().getInstId());%>">Моя БД</a>
-            <a class="mdl-navigation__link" href="/childrenList?db=-1">Другие БД</a>
-            <ul class="demo-list-item mdl-list">
+            <a class="mdl-navigation__link" href="/childrenList?db=-1">Все доступные</a>
+            </hr>
             <%
                 List<Institution> institutions = (List<Institution>) WorkingWithChildData.getInstitutions();
                 for(int i = 0; i < institutions.size(); i++){
                     Model model = Model.getInstance();
                     if( institutions.get(i).getParentId() == model.getUser().getInstId())
-                        out.println("<li class=\"mdl-list__item\"> <span  class=\"mdl-list__item-primary-content\"><a href='/childrenList?db=" + institutions.get(i).getId() + "'>" + institutions.get(i).getName() + "</a></span> </li>");
+                        out.println("<a class=\"mdl-navigation__link\" href='/childrenList?db=" + institutions.get(i).getId() + "'>" + institutions.get(i).getName() + "</a>");
                 }
+                out.println("<a class=\"mdl-navigation__link\" href='/childrenList?db=-2' >" + "Архив" + "</a>");
+                out.println("<a class=\"mdl-navigation__link\" href='/childrenList?db=-3' >" + "Корзина" + "</a>");
             %>
-            </ul>
         </nav>
     </div>
    <!-- <a href='/childrenList?db=<% out.print(ChildData.instId); %>'/>-->
@@ -127,7 +132,7 @@
         <div class="page-content">
             <table border="0">
                 <tr>
-                    <td valign="top"><style>
+                    <td valign="top" class="td-style"><style>
                         .demo-list-item {
                             align-content: flex-start;
                             width: 300px;
@@ -139,7 +144,8 @@
                             if (children != null) {
                                 out.println("<ul class=\"demo-list-item mdl-list\">");
                                 for (Child s : children) {
-                                    out.println("<li class=\"mdl-list__item\"> <span  class=\"mdl-list__item-primary-content\"><a href='/childrenList?id=" + s.getID() + "&db=" + ChildData.instId + "'>" + s.getFirstName() + " "  + s.getLastName() + "</span> </li>");
+                                    out.println("<li class=\"mdl-list__item\"><a class=\"mdl-navigation__link\" href='/childrenList?id="
+                                            + s.getID() + "&db=" + ChildData.instId + "'>" + s.getFirstName() + " "  + s.getLastName() + "</a></li>");
                                 }
                                 out.println("</ul>");
                             } else out.println("<p>There are no children yet!</p>");
@@ -155,8 +161,7 @@
                                     if(request.getAttribute("adding") !=  null) out.print(request.getAttribute("adding"));
                                 %>
                                 <label>Личные данные</label>
-                                <!-- Primary-colored flat button -->
-                                <button class="mdl-button mdl-js-button mdl-button--primary" name="action" value="add">Добавить
+                                <button style="margin-right: 10px;" class="mdl-button mdl-js-button mdl-button--primary" name="action" value="add">Добавить
                                 </button>
 
                             </div>
@@ -206,12 +211,11 @@
                                         </label>
                                     </div>
                                     <label for="date">Дата рождения: </label>
-                                    <input type="date" id="date" name="date"
+                                    <input type="date" id="date" name="date" max="2018-05-03" min="1970-01-01"
                                             <%
                                                 if(child!=null) {
-                                                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                                                    String date = df.format(child.getBirthday());
-                                                    out.print("value=" + date);
+                                                    SimpleDateFormat formatForDateNow = new SimpleDateFormat("yyyy-MM-dd");
+                                                    out.print("value='" + formatForDateNow.format(child.getBirthday()) + "'");
                                                 }
                                                 else{
                                                     out.print("value='2018-04-29'");
@@ -267,6 +271,7 @@
                                                     <%
                                                     if(child!=null)
                                                         out.print("value=" + child.getClassOrCource());
+                                                    else out.print("value='0'");
                                                 %>>
                                                 <label class="mdl-textfield__label" for="sample4">Класс или курс</label>
                                                 <span class="mdl-textfield__error">Это не число</span>
@@ -457,9 +462,27 @@
 
                             </div>
 <div class="div-style">
-    <button class="mdl-button mdl-js-button mdl-button--primary" type="submit" name="action" value="archive">В архив</button>
-
-    <button class="mdl-button mdl-js-button mdl-button--accent" id="show-dialog" type="button">Удалить</button>
+    <div>
+        <label for="archive" >Причина</label>
+        <select name="archiveList" id="archive" class="label-style">
+            <%
+                for(int i = 0; i < ChildData.archiveList.size(); i++){
+                        out.print("<option value='" + i + "'>" + ChildData.archiveList.get(i) + "</option>");
+                }
+            %>
+        </select>
+    </div>
+    <button class="mdl-button mdl-js-button mdl-button--primary" name="action" type="submit" value="archive"
+            <%
+                Model model = Model.getInstance();
+                if(ChildData.instId != model.getUser().getInstId())
+                    out.print("disabled");
+            %>>В архив</button>
+    <button class="mdl-button mdl-js-button mdl-button--accent" id="show-dialog" type="button"
+            <%
+                if(ChildData.instId != model.getUser().getInstId())
+                    out.print("disabled");
+            %>>Удалить</button>
     <dialog class="mdl-dialog">
         <div class="mdl-dialog__content">
             <h6>Вы действительно хотите удалить эту карточку?</h6>
@@ -487,7 +510,6 @@
     </script>
     <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" name="action" value="save"
     <%
-        Model model = Model.getInstance();
         if(ChildData.instId != model.getUser().getInstId())
             out.print("disabled");
     %>>Сохранить</button></div>

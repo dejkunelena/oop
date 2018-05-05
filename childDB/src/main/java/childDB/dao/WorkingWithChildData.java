@@ -38,6 +38,30 @@ public class WorkingWithChildData {
         }
     }
 
+    public static Location getLocationFromQuery(String query){
+        Location location = new Location();
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try (Connection connection = DriverManager.getConnection(HOST, USERNAME, PASSWORD); Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                location = new Location();
+                location.setID(resultSet.getInt((1)));
+                location.setCity(resultSet.getString(2));
+                location.setRegion(resultSet.getString(3));
+                location.setArea(resultSet.getString(4));
+                location.setCity(resultSet.getBoolean(5));
+            }
+            return location;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static Institution getInstitutionFromID(int id){
         Institution institution = new Institution();
         String query = "SELECT * FROM institutions WHERE id=" + id +";";

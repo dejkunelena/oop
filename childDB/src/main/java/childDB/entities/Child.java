@@ -34,6 +34,16 @@ public class Child {
 
     //дата учета
     private Date AccountingDate;
+
+    public Date getDateOfLastChange() {
+        return DateOfLastChange;
+    }
+
+    public void setDateOfLastChange(Date dateOfLastChange) {
+        DateOfLastChange = dateOfLastChange;
+    }
+
+    private Date DateOfLastChange;
     private String Notes;
 
     public Child() {
